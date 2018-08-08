@@ -1,19 +1,20 @@
 window.onload = () => {
     Storage.get(['state']).then((values) => {
-        let fakeRemote = new FakeRemote();
-        fakeRemote.initFakeRemote(values.state);
+        let fakeRemote = new FakeRemote(values.state);
+        fakeRemote.initFakeRemote();
     });
 
 };
 
 class FakeRemote {
 
-    constructor() {
+    constructor(state) {
         this.eventListeners = {};
+        this.state = state;
     }
 
-    initFakeRemote(state) {
-        let active = state === STATES.ACTIVE;
+    initFakeRemote() {
+        let active = this.state === STATES.ACTIVE;
         this.addListeners();
         if (active) {
             this.initFakeRemoteDom();
@@ -98,12 +99,16 @@ class FakeRemote {
     }
 
     initMessageListener() {
-        chrome.extension.onMessage.addListener((message) => {
-            if (message.onInputValueChange) {
+        chrome.extension.onMessage.addListener((message, sender, sendResponse) => {
+            if (message.askState) {
+                console.log('send response');
+                sendResponse({state: this.state})
+            }else if (message.onInputValueChange) {
                 let value = message.onInputValueChange;
                 this.updateEventListener(value.key, value.value);
             } else if (message.onStateChange) {
                 let value = message.onStateChange;
+                this.state = value;
                 if (value === STATES.ACTIVE) {
                     this.initFakeRemoteDom();
                     this.initFakeRemoteTouchDom();
