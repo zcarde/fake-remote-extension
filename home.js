@@ -7,6 +7,7 @@ let actualizeVisible = (previousState) => {
             Utils.toggleVisible(node);
         });
     }
+    console.log('States', States, state);
     States[state].map((id) => {
         let node = document.getElementById(id);
         Utils.toggleVisible(node);
@@ -33,8 +34,25 @@ let hideAll = () => {
         });
     });
 };
+let askState = (toggleBtn) => {
+    let message = new Message({ askState: true });
+    console.log('message', message);
+    message.onResponse.then((response) => {
+        if (!response) {
+            response = { state: STATES.INACTIVE };
+        }
+        state = response.state;
+        if (state === STATES.ACTIVE) {
+            toggleBtn.classList.add('active');
+        } else {
+            toggleBtn.classList.remove('active');
+        }
+        console.log('response', response);
+    })
+};
 let loadApp = (initState) => {
     let toggleBtn = document.getElementById("toggleBtn");
+    askState(toggleBtn);
     hideAll();
     new Config();
     state = initState;
@@ -46,7 +64,7 @@ let loadApp = (initState) => {
         let state = Utils.toggleClass(toggleBtn, 'active');
         state = toggleExtensionState(state);
         saveExtensionState(state);
-        new Message({onStateChange: state});
+        new Message({ onStateChange: state });
     };
 
 };
@@ -54,7 +72,7 @@ let loadApp = (initState) => {
 window.onload = () => {
     Storage.get(['state']).then((values) => {
         if (!values.state) {
-            values = {state: STATES.ACTIVE};
+            values = { state: STATES.ACTIVE };
         }
         loadApp(values.state);
 
