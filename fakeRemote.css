@@ -1,0 +1,16 @@
+#fakeRemote {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 99999;
+}
+#fakeRemote img {
+  width: 200px;
+  height: 800px;
+}
+#fakeRemote .keyNode {
+  position: fixed;
+  z-index: 9999999;
+  border-radius: 500px;
+  border: solid 1px white;
+}
