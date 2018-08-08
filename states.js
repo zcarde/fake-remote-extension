@@ -1,8 +1,8 @@
 let STATES = {
     ACTIVE: 'active',
-    DESACTIVATED: 'desactivated'
+    INACTIVE: 'inactive'
 };
 let States = {
     active: ['header', 'config'],
-    desactivated: ['header', 'config']
+    inactive: ['header', 'config']
 };

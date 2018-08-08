@@ -17,7 +17,7 @@ let toggleExtensionState = (newState) => {
     if (newState) {
         state = STATES.ACTIVE;
     } else {
-        state = STATES.DESACTIVATED;
+        state = STATES.INACTIVE;
     }
     actualizeVisible(previousState);
     return state;
