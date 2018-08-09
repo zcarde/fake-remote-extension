@@ -105,7 +105,6 @@ class FakeRemote {
     initMessageListener() {
         chrome.extension.onMessage.addListener((message, sender, sendResponse) => {
             if (message.askState) {
-                console.log('send response');
                 sendResponse({ state: this.state })
             } else if (message.onInputValueChange) {
                 let value = message.onInputValueChange;
@@ -124,8 +123,8 @@ class FakeRemote {
     }
 
     addListeners() {
-        document.addEventListener('keypress', (key) => {
-            console.log('keypress', key)
-        })
+        //document.addEventListener('keypress', (key) => {
+        //    console.log('keypress', key)
+        //})
     }
 }
