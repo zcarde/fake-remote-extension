@@ -21,4 +21,7 @@ class Utils {
     static hide(node) {
         node.classList.add('invisible');
     }
+    static show(node) {
+        node.classList.remove('invisible');
+    }
 }

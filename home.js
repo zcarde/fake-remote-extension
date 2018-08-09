@@ -4,24 +4,13 @@ let actualizeVisible = (previousState) => {
     if (previousState) {
         States[previousState].map((id) => {
             let node = document.getElementById(id);
-            Utils.toggleVisible(node);
+            Utils.hide(node);
         });
     }
-    console.log('States', States, state);
     States[state].map((id) => {
         let node = document.getElementById(id);
-        Utils.toggleVisible(node);
+        Utils.show(node);
     });
-};
-let toggleExtensionState = (newState) => {
-    let previousState = state;
-    if (newState) {
-        state = STATES.ACTIVE;
-    } else {
-        state = STATES.INACTIVE;
-    }
-    actualizeVisible(previousState);
-    return state;
 };
 let saveExtensionState = (state) => {
     Storage.set({ 'state': state });
@@ -36,18 +25,18 @@ let hideAll = () => {
 };
 let askState = (toggleBtn) => {
     let message = new Message({ askState: true });
-    console.log('message', message);
-    message.onResponse.then((response) => {
-        if (!response) {
-            response = { state: STATES.INACTIVE };
-        }
-        state = response.state;
-        if (state === STATES.ACTIVE) {
-            toggleBtn.classList.add('active');
-        } else {
-            toggleBtn.classList.remove('active');
-        }
-        console.log('response', response);
+    message.onResponse.then((responses) => {
+        responses.map((response) => {
+            if (!response) {
+                response = { state: STATES.INACTIVE };
+            }
+            state = response.state;
+            if (state === STATES.ACTIVE) {
+                toggleBtn.classList.add('active');
+            } else {
+                toggleBtn.classList.remove('active');
+            }
+        });
     })
 };
 let loadApp = (initState) => {
@@ -61,10 +50,16 @@ let loadApp = (initState) => {
     }
     actualizeVisible();
     toggleBtn.onclick = () => {
-        let state = Utils.toggleClass(toggleBtn, 'active');
-        state = toggleExtensionState(state);
+        let previousState = state;
+        state = state === STATES.ACTIVE ? STATES.INACTIVE : STATES.ACTIVE;
+        if (state === STATES.ACTIVE) {
+            toggleBtn.classList.add(STATES.ACTIVE)
+        } else {
+            toggleBtn.classList.remove(STATES.ACTIVE)
+        }
+        actualizeVisible(previousState);
         saveExtensionState(state);
-        new Message({ onStateChange: state });
+        new Message({ onStateChange: state }, true);
     };
 
 };

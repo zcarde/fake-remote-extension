@@ -63,8 +63,12 @@ class FakeRemote {
     }
 
     updateEventListener(key, newKeyConf) {
-        this.eventListeners[key].node.removeEventListener('click', this.eventListeners[key].event);
-        this.setEventListener(this.eventListeners[key].node, newKeyConf, key);
+        if (!this.eventListeners[key] || !this.eventListeners[key].node) {
+            this.createKeyDom(newKeyConf, TOUCHES[key], key)
+        } else {
+            this.eventListeners[key].node.removeEventListener('click', this.eventListeners[key].event);
+            this.setEventListener(this.eventListeners[key].node, newKeyConf, key);
+        }
     }
 
     setEventListener(node, eventConfig, key) {
@@ -102,8 +106,8 @@ class FakeRemote {
         chrome.extension.onMessage.addListener((message, sender, sendResponse) => {
             if (message.askState) {
                 console.log('send response');
-                sendResponse({state: this.state})
-            }else if (message.onInputValueChange) {
+                sendResponse({ state: this.state })
+            } else if (message.onInputValueChange) {
                 let value = message.onInputValueChange;
                 this.updateEventListener(value.key, value.value);
             } else if (message.onStateChange) {

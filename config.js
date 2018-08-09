@@ -40,6 +40,6 @@ class Config {
         let obj = {};
         obj['keys.' + touche] = value;
         Storage.set(obj);
-        new Message({ onInputValueChange: { key: touche, value } });
+        new Message({ onInputValueChange: { key: touche, value } }, true);
     }
 }
