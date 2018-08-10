@@ -3,9 +3,6 @@ window.onload = () => {
         let fakeRemote = new FakeRemote(values.state);
         fakeRemote.initFakeRemote();
     });
-    document.addEventListener('keypress', (key) => {
-        console.log('keypress', key)
-    })
 };
 
 class FakeRemote {
@@ -85,16 +82,38 @@ class FakeRemote {
 
     setKeyEventListener(node, eventConfig, key) {
         this.eventListeners[key].event = () => {
-            let event = new KeyboardEvent("keypress", {
+            let eventDown = new KeyboardEvent("keydown", {
                 bubbles: true,
                 cancelable: true,
+                which: eventConfig.code,
                 key: eventConfig.key,
-                charCode: eventConfig.charCode,
-                repeat: eventConfig.repeat
+                repeat: eventConfig.repeat,
+                keyCode: eventConfig.code
             });
-            delete event.keyCode;
-            Object.defineProperty(event, "keyCode", { "value": eventConfig.keyCode });
-            document.getElementsByTagName('body')[0].dispatchEvent(event);
+            let eventPress = new KeyboardEvent("keypress", {
+                bubbles: true,
+                cancelable: true,
+                which: eventConfig.pressCode,
+                key: eventConfig.key,
+                repeat: eventConfig.repeat,
+                charCode: eventConfig.pressCode,
+                keyCode: eventConfig.pressCode
+            });
+            let eventUp = new KeyboardEvent("keyup", {
+                bubbles: true,
+                cancelable: true,
+                which: eventConfig.code,
+                key: eventConfig.key,
+                repeat: eventConfig.repeat,
+                keyCode: eventConfig.code
+
+            });
+
+            document.dispatchEvent(eventDown);
+            if (eventConfig.pressCode) {
+                document.dispatchEvent(eventPress);
+            }
+            document.dispatchEvent(eventUp);
         };
         node.addEventListener('click', this.eventListeners[key].event);
     }
