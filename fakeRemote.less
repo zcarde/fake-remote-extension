@@ -1,35 +1,35 @@
 @width: 200px;
 @heigth: 800px;
 #fakeRemoteContainer {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: @width;
-  height: @heigth;
-  z-index: 99999;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: @width !important;
+  height: @heigth !important;
+  z-index: 99999 !important;
   #fakeRemote {
-    position: fixed;
-    top: 0;
-    left: 0;
-    //height: @heigth;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    //height: @heigth !important;
     img {
-      width: @width;
-      height: @heigth;
+      width: @width !important;
+      height: @heigth !important;
     }
 
   }
   #eventZone {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: @heigth;
-    width: @width;
-    z-index: 999999;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    height: @heigth !important;
+    width: @width !important;
+    z-index: 999999 !important;
     .keyNode {
-      position: absolute;
-      //z-index: 9999999;
-      border-radius: 500px;
-      border: solid 1px white;
+      position: absolute !important;
+      //z-index: 9999999 !important;
+      border-radius: 500px !important;
+      border: solid 1px white !important;
     }
   }
 }
