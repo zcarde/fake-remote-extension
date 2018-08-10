@@ -3,7 +3,9 @@ window.onload = () => {
         let fakeRemote = new FakeRemote(values.state);
         fakeRemote.initFakeRemote();
     });
-
+    document.addEventListener('keypress', (key) => {
+        console.log('keypress', key)
+    })
 };
 
 class FakeRemote {
@@ -11,13 +13,14 @@ class FakeRemote {
     constructor(state) {
         this.eventListeners = {};
         this.state = state;
+        this.dragValues = null;
+        this.position = { x: 0, y: 0 };
     }
 
     initFakeRemote() {
         let active = this.state === STATES.ACTIVE;
-        this.addListeners();
         if (active) {
-            this.initFakeRemoteDom();
+
         }
         this.initMessageListener();
         Storage.get(Object.keys(TOUCHES).map((el) => 'keys.' + el)).then((value) => {
@@ -27,10 +30,19 @@ class FakeRemote {
                     this.keyCodes[el] = value['keys.' + el];
                 }
             });
-            if (active) {
-                this.initFakeRemoteTouchDom();
-            }
+            this.dealWithState();
         });
+    }
+
+    dealWithState() {
+        if (this.state === STATES.ACTIVE) {
+            this.initFakeRemoteDom();
+            this.initFakeRemoteListeners();
+            this.initFakeRemoteTouchDom();
+
+        } else {
+            this.removeFakeRemoteDom();
+        }
     }
 
     initFakeRemoteTouchDom() {
@@ -57,8 +69,8 @@ class FakeRemote {
                 node: node
             };
         }
-        this.setEventListener(node, eventConfig, key);
-        this.container.appendChild(node);
+        this.setKeyEventListener(node, eventConfig, key);
+        this.eventZoneNode.appendChild(node);
 
     }
 
@@ -67,11 +79,11 @@ class FakeRemote {
             this.createKeyDom(newKeyConf, TOUCHES[key], key)
         } else {
             this.eventListeners[key].node.removeEventListener('click', this.eventListeners[key].event);
-            this.setEventListener(this.eventListeners[key].node, newKeyConf, key);
+            this.setKeyEventListener(this.eventListeners[key].node, newKeyConf, key);
         }
     }
 
-    setEventListener(node, eventConfig, key) {
+    setKeyEventListener(node, eventConfig, key) {
         this.eventListeners[key].event = () => {
             let event = new KeyboardEvent("keypress", {
                 bubbles: true,
@@ -88,17 +100,30 @@ class FakeRemote {
     }
 
     initFakeRemoteDom() {
-        this.container = document.createElement('div');
-        this.container.setAttribute('id', 'fakeRemote');
-        this.img = document.createElement('img');
-        this.img.src = chrome.extension.getURL("remote.png");
-        this.container.appendChild(this.img);
+        this.containerNode = document.createElement('div');
+        this.containerNode.setAttribute('id', 'fakeRemoteContainer');
+
+        this.fakeRemoteNode = document.createElement('div');
+        this.fakeRemoteNode.setAttribute('id', 'fakeRemote');
+
+        this.eventZoneNode = document.createElement('div');
+        this.eventZoneNode.setAttribute('id', 'eventZone');
+
+        this.imgNode = document.createElement('img');
+        this.imgNode.src = chrome.extension.getURL("remote.png");
+
+        this.fakeRemoteNode.appendChild(this.imgNode);
+        this.containerNode.appendChild(this.eventZoneNode);
+        this.containerNode.appendChild(this.fakeRemoteNode);
+
         let body = document.getElementsByTagName('body')[0];
-        body.appendChild(this.container);
+        body.appendChild(this.containerNode);
     }
 
     removeFakeRemoteDom() {
-        this.container.remove();
+        if (this.containerNode) {
+            this.containerNode.remove();
+        }
         this.eventListeners = {};
     }
 
@@ -108,23 +133,52 @@ class FakeRemote {
                 sendResponse({ state: this.state })
             } else if (message.onInputValueChange) {
                 let value = message.onInputValueChange;
-                this.updateEventListener(value.key, value.value);
-            } else if (message.onStateChange) {
-                let value = message.onStateChange;
-                this.state = value;
-                if (value === STATES.ACTIVE) {
-                    this.initFakeRemoteDom();
-                    this.initFakeRemoteTouchDom();
-                } else {
-                    this.removeFakeRemoteDom();
+                if (this.state === STATES.ACTIVE) {
+                    this.updateEventListener(value.key, value.value);
                 }
+            } else if (message.onStateChange) {
+                this.state = message.onStateChange;
+                this.dealWithState();
             }
         });
     }
 
-    addListeners() {
-        //document.addEventListener('keypress', (key) => {
-        //    console.log('keypress', key)
-        //})
+    initFakeRemoteListeners() {
+        this.eventZoneNode.addEventListener('mousedown', (e) => this.onDragStart(e));
+        this.eventZoneNode.addEventListener('mouseup', (e) => this.onDragEnd(e));
+        this.eventZoneNode.addEventListener('mousemove', (e) => this.onDrag(e));
+    }
+
+    onDragStart(event) {
+        this.dragValues = {
+            previousX: event.clientX,
+            previousY: event.clientY
+        };
+    }
+
+    onDragEnd(event) {
+        this.dragValues = null;
+    }
+
+    onDrag(event) {
+        if (this.dragValues) {
+            let deltaX = event.clientX - this.dragValues.previousX;
+            let deltaY = event.clientY - this.dragValues.previousY;
+            this.dragValues.previousX = event.clientX;
+            this.dragValues.previousY = event.clientY;
+
+            this.setRemotePosition(this.position.x + deltaX, this.position.y + deltaY);
+        }
+    }
+
+    setRemotePosition(top, left) {
+        this.position.x = top;
+        this.position.y = left;
+        this.containerNode.style.top = left + 'px';
+        this.containerNode.style.left = top + 'px';
+        this.fakeRemoteNode.style.top = left + 'px';
+        this.fakeRemoteNode.style.left = top + 'px';
+        this.eventZoneNode.style.top = left + 'px';
+        this.eventZoneNode.style.left = top + 'px';
     }
 }

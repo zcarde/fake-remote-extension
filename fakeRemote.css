@@ -1,16 +1,30 @@
-#fakeRemote {
+#fakeRemoteContainer {
   position: fixed;
   top: 0;
   left: 0;
+  width: 200px;
+  height: 800px;
   z-index: 99999;
 }
-#fakeRemote img {
+#fakeRemoteContainer #fakeRemote {
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+#fakeRemoteContainer #fakeRemote img {
   width: 200px;
   height: 800px;
 }
-#fakeRemote .keyNode {
+#fakeRemoteContainer #eventZone {
   position: fixed;
-  z-index: 9999999;
+  top: 0;
+  left: 0;
+  height: 800px;
+  width: 200px;
+  z-index: 999999;
+}
+#fakeRemoteContainer #eventZone .keyNode {
+  position: absolute;
   border-radius: 500px;
   border: solid 1px white;
 }

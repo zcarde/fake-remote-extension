@@ -24,6 +24,7 @@ class Config {
             this.parentNode.appendChild(node);
 
             input.addEventListener('keydown', (event) => {
+                console.log('Keydown', event)
                 this.inputValueChanged(touche, {
                     key: event.key,
                     keyCode: event.keyCode,

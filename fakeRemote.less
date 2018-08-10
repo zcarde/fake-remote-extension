@@ -1,16 +1,35 @@
-#fakeRemote {
+@width: 200px;
+@heigth: 800px;
+#fakeRemoteContainer {
   position: fixed;
   top: 0;
   left: 0;
+  width: @width;
+  height: @heigth;
   z-index: 99999;
-  img {
-    width: 200px;
-    height: 800px;
-  }
-  .keyNode {
+  #fakeRemote {
     position: fixed;
-    z-index: 9999999;
-    border-radius: 500px;
-    border: solid 1px white;
+    top: 0;
+    left: 0;
+    //height: @heigth;
+    img {
+      width: @width;
+      height: @heigth;
+    }
+
+  }
+  #eventZone {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: @heigth;
+    width: @width;
+    z-index: 999999;
+    .keyNode {
+      position: absolute;
+      //z-index: 9999999;
+      border-radius: 500px;
+      border: solid 1px white;
+    }
   }
 }
